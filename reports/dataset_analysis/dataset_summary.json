@@ -1,0 +1,99 @@
+{
+  "train_source1": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/train/train_source1.tsv",
+    "row_count": 2206821,
+    "country_counts": {
+      "US": 1323633,
+      "India": 883188
+    },
+    "entity_id_integrity": {
+      "unique_ids": 2206821,
+      "duplicate_ids": 0
+    }
+  },
+  "train_source2": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/train/train_source2.tsv",
+    "row_count": 5034616,
+    "country_counts": {
+      "US": 3016817,
+      "India": 2017799
+    },
+    "entity_id_integrity": {
+      "unique_ids": 5034616,
+      "duplicate_ids": 0
+    }
+  },
+  "train_source3": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/train/train_source3.tsv",
+    "row_count": 5285603,
+    "country_counts": {
+      "US": 3170056,
+      "India": 2115547
+    },
+    "entity_id_integrity": {
+      "unique_ids": 5285603,
+      "duplicate_ids": 0
+    }
+  },
+  "train_ground_truth": {
+    "rows": 2206821,
+    "nonempty_matches": 2083574,
+    "empty_matches": 123247,
+    "unique_s1": 2206821,
+    "rows_with_s2": 1919076,
+    "rows_with_s3": 1940545,
+    "rows_with_both": 1776047,
+    "match_count_distribution": {
+      "3": 530841,
+      "10": 534,
+      "8": 18680,
+      "6": 164868,
+      "5": 321957,
+      "2": 375212,
+      "11": 37,
+      "1": 119157,
+      "4": 484115,
+      "9": 4205,
+      "7": 63968
+    }
+  },
+  "test_source1": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/test/test_source1.tsv",
+    "row_count": 1732544,
+    "country_counts": {
+      "US": 663106,
+      "India": 809986,
+      "France": 259452
+    },
+    "entity_id_integrity": {
+      "unique_ids": 1732544,
+      "duplicate_ids": 0
+    }
+  },
+  "test_source2": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/test/test_source2.tsv",
+    "row_count": 4887273,
+    "country_counts": {
+      "US": 1871330,
+      "India": 2312565,
+      "France": 703378
+    },
+    "entity_id_integrity": {
+      "unique_ids": 4887273,
+      "duplicate_ids": 0
+    }
+  },
+  "test_source3": {
+    "path": "/home/vikaspal/Desktop/ml_chl/6ab10eb3b23ba_student_resource/student_resource/dataset/test/test_source3.tsv",
+    "row_count": 5082316,
+    "country_counts": {
+      "US": 1945701,
+      "India": 2405000,
+      "France": 731615
+    },
+    "entity_id_integrity": {
+      "unique_ids": 5082316,
+      "duplicate_ids": 0
+    }
+  }
+}
