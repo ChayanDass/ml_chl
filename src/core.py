@@ -96,7 +96,7 @@ def validation_report(paths:dict[str,Path], artifact:Path, sample:int|None=None)
 
 class Index:
  def __init__(self, targets:list[dict], config:dict):
-  self.targets={r['entity_id']:r for r in targets}; self.config=config; self.ids=[]; self.maps={k:defaultdict(uint_array) for k in ('name','token','gram','address','country')}; self.vec={}; self.ann=None; self.ann_name=None; self.ann_ids=[]; self.multilingual_vec={}; self.multilingual_model=None; self.multilingual_ann=None
+  self.targets={r['entity_id']:r for r in targets}; self.config=config; self.ids=[]; self.maps={k:defaultdict(uint_array) for k in ('name','token','gram','address','country')}; self.vec={}; self.ann=None; self.ann_name=None; self.ann_ids=[]; self.multilingual_ids=[]; self.multilingual_vec={}; self.multilingual_model=None; self.multilingual_ann=None
   for pos,r in enumerate(targets):
    i=r['entity_id']; self.ids.append(i); self.maps['name'][r['name_n']].append(pos) if r['name_n'] else None
    for t in cached_value(r,'name_tokens',lambda:tokens(r['business_name'])): self.maps['token'][t].append(pos)
@@ -118,12 +118,23 @@ class Index:
    from sentence_transformers import SentenceTransformer
   except ImportError as e:
    raise RuntimeError('multilingual retrieval is enabled but sentence-transformers is unavailable') from e
-  model_name=mc.get('model','intfloat/multilingual-e5-small')
-  self.multilingual_model=SentenceTransformer(model_name,device=mc.get('device','cpu'))
-  texts=[f"passage: {self.targets[i]['business_name']}" for i in self.ids]
-  vectors=self.multilingual_model.encode(texts,batch_size=int(mc.get('batch_size',64)),normalize_embeddings=True,show_progress_bar=False,convert_to_numpy=True)
-  self.multilingual_vec={i:tuple(float(x) for x in v) for i,v in zip(self.ids,vectors)}
-  if mc.get('index_type','exact') != 'exact': self._build_multilingual_ann(vectors)
+  model_name=mc.get('model','intfloat/multilingual-e5-small'); kind=mc.get('index_type','hnsw'); fraction=float(mc.get('target_fraction',1.0)); fraction=max(0.0,min(1.0,fraction))
+  self.multilingual_ids=[i for i in self.ids if int(stable_hash(i)[:8],16)/0xffffffff < fraction]
+  if not self.multilingual_ids: raise ValueError('multilingual target_fraction selected zero targets')
+  device=mc.get('device','auto')
+  if device=='auto':
+   try:
+    import torch; device='cuda' if torch.cuda.is_available() else 'cpu'
+   except ImportError: device='cpu'
+  if kind=='exact' and len(self.multilingual_ids)>int(mc.get('exact_max_targets',100000)): raise ValueError('multilingual exact index is unsafe at full scale; use index_type=hnsw')
+  self.multilingual_model=SentenceTransformer(model_name,device=device); batch=int(mc.get('batch_size',128)); dim=int(self.multilingual_model.get_sentence_embedding_dimension())
+  if kind!='hnsw': raise ValueError('full-scale multilingual retrieval requires index_type=hnsw')
+  import faiss
+  if hasattr(faiss,'omp_set_num_threads'): faiss.omp_set_num_threads(int(self.config.get('resources',{}).get('workers',22)))
+  self.multilingual_ann=faiss.IndexHNSWFlat(dim,int(mc.get('hnsw_m',32)),faiss.METRIC_INNER_PRODUCT); self.multilingual_ann.hnsw.efConstruction=int(mc.get('ef_construction',80)); self.multilingual_ann.hnsw.efSearch=int(mc.get('ef_search',64))
+  for start in range(0,len(self.multilingual_ids),batch):
+   ids=self.multilingual_ids[start:start+batch]; texts=[f"passage: {self.targets[i]['business_name']}" for i in ids]
+   vectors=self.multilingual_model.encode(texts,batch_size=batch,normalize_embeddings=True,show_progress_bar=False,convert_to_numpy=True); self.multilingual_ann.add(vectors)
 
  def _build_multilingual_ann(self, vectors):
   mc=self._multilingual_config()
@@ -255,7 +266,7 @@ class Index:
     if hasattr(self.multilingual_ann,'hnsw'): self.multilingual_ann.hnsw.efSearch=int(mc.get('ef_search',64))
     if hasattr(self.multilingual_ann,'nprobe'): self.multilingual_ann.nprobe=min(int(mc.get('nprobe',8)),self.multilingual_ann.nlist)
     scores,positions=self.multilingual_ann.search(np.asarray([q],dtype='float32'),k)
-    return {self.ids[int(pos)]:float(score) for score,pos in zip(scores[0],positions[0]) if pos>=0 and score>=float(mc.get('min_similarity',0.0))}
+    return {self.multilingual_ids[int(pos)]:float(score) for score,pos in zip(scores[0],positions[0]) if pos>=0 and score>=float(mc.get('min_similarity',0.0))}
    ranked=sorted(((sum(float(a)*b for a,b in zip(q,v)),i) for i,v in self.multilingual_vec.items()),key=lambda x:(-x[0],x[1]))
    return {i:score for score,i in ranked[:k] if score>=float(mc.get('min_similarity',0.0))}
   e=self.config.get('embedding',{}); k=c['embedding_limit']
@@ -374,6 +385,11 @@ def split_ids(ids,truth,frac,seed):
  for g,v in groups.items():
   random.Random(seed+int(g)).shuffle(v); va.update(v[:max(1,round(len(v)*frac))])
  return set(ids)-va,va
+def select_training_s1(s1,truth,fraction,seed):
+ """Deterministic entity-level reduction: retain all positives, sample negatives by hash."""
+ ids=[r['entity_id'] for r in s1]; target=max(1,round(len(ids)*float(fraction))); positives=[i for i in ids if truth.get(i)]; negatives=[i for i in ids if not truth.get(i)]
+ if len(positives)>=target: return set(positives)
+ ranked=sorted(negatives,key=lambda i:stable_hash({'seed':seed,'id':i})); return set(positives+ranked[:target-len(positives)])
 def label_and_sample(rows,truth,train_ids,negative_ratio,seed):
  pos=[]; neg=[]
  for r in rows:

@@ -25,6 +25,14 @@ class CheckpointStore:
    for p in (payload,manifest):
     if p.exists(): os.replace(p,p.with_name(p.name+f'.corrupt-{int(time.time()*1000)}'))
    return None
+ def valid_payload(self, stage:str, unit:str):
+  """Validate manifest/payload without loading a potentially huge JSONL into RAM."""
+  payload=self._payload(stage,unit); manifest=self._manifest(stage,unit)
+  try:
+   m=json.loads(manifest.read_text(encoding='utf8'))
+   return (m.get('status')=='complete' and m.get('lineage_hash')==self._expected() and payload.exists() and m.get('checksum')==file_hash(payload))
+  except (FileNotFoundError, ValueError, json.JSONDecodeError, OSError):
+   return False
  def commit(self, stage:str, unit:str, rows:Iterable[dict], extra:dict|None=None):
   rows=list(rows); payload=self._payload(stage,unit); write_jsonl(payload,rows)
   m=json.loads(self._manifest(stage,unit).read_text(encoding='utf8'))
