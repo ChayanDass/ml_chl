@@ -1,0 +1,6 @@
+lightgbm==4.5.0
+numpy==1.26.4
+scikit-learn==1.4.1.post1
+# Install faiss-cpu on supported CPU environments, or a compatible FAISS GPU build
+# on the RTX workstation after validating CUDA/runtime compatibility.
+faiss-cpu>=1.8.0

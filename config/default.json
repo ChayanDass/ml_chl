@@ -1,0 +1,34 @@
+{
+  "seed": 20260926,
+  "batch_size": 5000,
+  "candidate_partition_size": 5000,
+  "feature_partition_size": 5000,
+  "scoring_partition_size": 5000,
+  "validation_fraction": 0.10,
+  "negative_ratio": 4,
+  "thresholds": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90],
+  "retrieval": {"token_limit": 30, "fuzzy_limit": 20, "address_limit": 30, "country_limit": 15, "embedding_limit": 20, "max_postings": 5000},
+  "embedding": {
+    "backend": "faiss_ivfpq",
+    "dimensions": 64,
+    "index_type": "IVF-PQ",
+    "nlist": 4096,
+    "nprobe": 32,
+    "pq_m": 8,
+    "pq_nbits": 8,
+    "train_samples": 200000,
+    "batch_size": 4096,
+    "bruteforce_max_targets": 100000,
+    "use_gpu": false
+  },
+  "model": {"n_estimators": 300, "learning_rate": 0.05, "num_leaves": 31, "min_child_samples": 20, "random_state": 20260926},
+  "resources": {
+    "device": "cpu",
+    "workers": 20,
+    "ram_soft_limit_gb": 96,
+    "ram_hard_limit_gb": 112,
+    "disk_reserve_gb": 80,
+    "vram_reserve_gb": 4,
+    "gpu_enabled": false
+  }
+}

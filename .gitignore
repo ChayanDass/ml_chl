@@ -1,6 +1,39 @@
+# Python environments and caches
+.venv/
+venv/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Large/local input data
+dataset/
+6ab10eb3b23ba_student_resource/
+*.tsv
+
+# Generated pipeline artifacts and outputs
+artifacts/
+output/
+output_*/
+*.pkl
+*.joblib
+*.bin
+*.jsonl
+*.jsonl.tmp
+*.manifest.json
+*.corrupt-*
+
+# Logs, profiling, local reports
+*.log
+reports/runtime/
+reports/benchmarks/
+
+# Editor / OS
+.vscode/
+.idea/
 .DS_Store
-**/__MACOSX/
-**/dataset/**/*.tsv
-6ab10eb3b23ba_student_resource
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
