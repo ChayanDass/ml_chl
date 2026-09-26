@@ -1,0 +1,11 @@
+script_pair,matched_pair_count,percentage_of_total_matches
+Latin vs Latin,7087125,92.7833
+Latin vs Devanagari,312725,4.0941
+Latin vs Telugu,45620,0.5972
+Latin vs Kannada,43379,0.5679
+Latin vs Tamil,39252,0.5139
+Latin vs Bengali,35910,0.4701
+Latin vs Gujarati,35819,0.4689
+Latin vs Malayalam,21930,0.2871
+Latin vs Odia,8681,0.1136
+Latin vs Gurmukhi,7924,0.1037

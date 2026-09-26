@@ -24,6 +24,12 @@ class PipelineTest(unittest.TestCase):
   s={'entity_id':'S1-1','business_name':'Acme Inc','business_address':'One Road','country':'US','source':'S1','ordinal':0,'name_n':'acme inc','address_n':'one road','country_n':'us'}
   conf={'retrieval':{'token_limit':3,'fuzzy_limit':3,'address_limit':3,'country_limit':3,'embedding_limit':3,'max_postings':20}}; ix=Index(target,conf); combined=ix.query(s)
   self.assertEqual({m:ix.query_method(s,m) for m in METHODS},combined)
+
+ def test_multilingual_method_is_explicitly_disabled_without_backend(self):
+  target=[{'entity_id':'S2-1','business_name':'राम बाजार','business_address':'Road','country':'India','source':'S2','ordinal':0,'name_n':norm('राम बाजार'),'address_n':'road','country_n':'india'}]
+  s={'entity_id':'S1-1','business_name':'Ram Bazaar','business_address':'Road','country':'India','source':'S1','ordinal':0,'name_n':norm('Ram Bazaar'),'address_n':'road','country_n':'india'}
+  conf={'retrieval':{'token_limit':3,'fuzzy_limit':3,'address_limit':3,'country_limit':3,'embedding_limit':3,'max_postings':20},'multilingual':{'enabled':False}}
+  ix=Index(target,conf); self.assertEqual(ix.query_method(s,'multilingual_name'),{}); self.assertIn('multilingual_name',METHODS)
  def test_persisted_bounded_embedding_index_reloads(self):
   target=[{'entity_id':'S2-1','business_name':'Acme','business_address':'Road','country':'US','source':'S2','ordinal':0,'name_n':'acme','address_n':'road','country_n':'us'}]
   conf={'retrieval':{'token_limit':3,'fuzzy_limit':3,'address_limit':3,'country_limit':3,'embedding_limit':3,'max_postings':20},'embedding':{'backend':'bruteforce','bruteforce_max_targets':10}}

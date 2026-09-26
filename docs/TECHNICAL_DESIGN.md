@@ -77,7 +77,7 @@ Proposed normalized dataset partitions store raw fields, normalized name/address
 
 ### 6.1 Overview
 
-For deterministic S1 batches, query independently built S2 and S3 indexes using six families, union returned target IDs, deduplicate on `(s1_id, candidate_id)`, retain every method’s evidence, and write partitioned candidate pairs. The exact same configured pipeline runs before training labels and at test time. Candidate recall, volume, reduction ratio and incremental contribution are evaluated separately from the classifier.
+For deterministic S1 batches, query independently built S2 and S3 indexes using the six frozen families plus the optional `multilingual_name` family, union returned target IDs, deduplicate on `(s1_id, candidate_id)`, retain every method’s evidence, and write partitioned candidate pairs. The exact same configured pipeline runs before training labels and at test time. Candidate recall, volume, reduction ratio and incremental contribution are evaluated separately from the classifier.
 
 ### 6.2 Exact and normalized-name blocking
 
@@ -104,6 +104,10 @@ Partition, prioritize, or annotate searches with country context, while issuing 
 Generate versioned name-focused and name-plus-address representations, store vectors plus record mapping, and query versioned nearest-neighbor indexes. The embedding model/license, index implementation, metric, k, and thresholds remain open configuration.
 
 Method 6 cannot use an external business-identity service. Any model must satisfy the challenge model-license/size conditions where applicable. Index manifests identify target data fingerprint, preprocessing version, method configuration, vector/model version (if any), and build date; mismatch forces rebuild.
+
+### 6.8 Proposed multilingual semantic name retrieval
+
+When `multilingual.enabled` is true, encode target and query business names with the configured compact multilingual text-embedding model (default candidate: `intfloat/multilingual-e5-small`) using consistent query/passage prefixes. Build a separately versioned approximate-nearest-neighbor index or equivalent resource-bounded index for S2 and S3 targets, retain the configured top-k and similarity evidence, and emit `multilingual_name` provenance. Original name/address fields and existing normalized views remain unchanged. Model availability, license, supported scripts, throughput, index size, and cross-script retrieval quality must be benchmarked before full-scale execution. Disabled configuration is an explicit baseline-compatible no-op.
 
 ### 6.8 Union, eligibility, and deduplication
 
@@ -374,3 +378,7 @@ Established constraints: ten-million-plus target-scale training data, open-count
 **Candidate pair:** an S1–S2/S3 pair admitted by the union. **Candidate recall:** fraction of known matches present in that set. **Feature schema:** ordered, versioned model-input contract. **Singleton:** S1 with no accepted/true target match. **Provenance:** methods/evidence that retrieved a candidate. **Macro F0.5:** per-S1 precision-weighted score averaged across S1 records.
 
 References: `docs/problem_statement.md` (official contract), `docs/SRS.md` and `docs/SRS_BASELINE.md` (baseline/change control), `docs/design_freeze.md` (frozen architecture), `docs/knowledge.md` (authoritative project knowledge), `useful/knowledge.md` (supporting dataset context), `docs/SRS_REVISION_SUMMARY.md`, `docs/SRS_RECONCILIATION_REPORT.md`, and `reports/dataset_analysis/`.
+
+## 21. Multilingual Architecture Revision Addendum
+
+See [MULTILINGUAL_ARCHITECTURE_ADDENDUM.md](MULTILINGUAL_ARCHITECTURE_ADDENDUM.md). This is a proposed, benchmark-gated extension to the six-family architecture. It does not modify the approved SRS baseline, official output contract, or frozen model/evaluation decisions.

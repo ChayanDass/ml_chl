@@ -1,0 +1,531 @@
+{
+  "sample_s1_size": 3500,
+  "total_gt_pairs_evaluated": 11089,
+  "overall_candidate_recall": 81.03,
+  "script_pair_recall": {
+    "Latin vs Latin": {
+      "total": 10286,
+      "retrieved": 8910,
+      "missed": 1376,
+      "recall_pct": 86.62
+    },
+    "Latin vs Devanagari": {
+      "total": 457,
+      "retrieved": 49,
+      "missed": 408,
+      "recall_pct": 10.72
+    },
+    "Latin vs Telugu": {
+      "total": 81,
+      "retrieved": 4,
+      "missed": 77,
+      "recall_pct": 4.94
+    },
+    "Latin vs Gujarati": {
+      "total": 66,
+      "retrieved": 3,
+      "missed": 63,
+      "recall_pct": 4.55
+    },
+    "Latin vs Kannada": {
+      "total": 61,
+      "retrieved": 5,
+      "missed": 56,
+      "recall_pct": 8.2
+    },
+    "Latin vs Bengali": {
+      "total": 55,
+      "retrieved": 2,
+      "missed": 53,
+      "recall_pct": 3.64
+    },
+    "Latin vs Tamil": {
+      "total": 51,
+      "retrieved": 9,
+      "missed": 42,
+      "recall_pct": 17.65
+    },
+    "Latin vs Malayalam": {
+      "total": 14,
+      "retrieved": 2,
+      "missed": 12,
+      "recall_pct": 14.29
+    },
+    "Latin vs Gurmukhi": {
+      "total": 9,
+      "retrieved": 1,
+      "missed": 8,
+      "recall_pct": 11.11
+    },
+    "Latin vs Odia": {
+      "total": 9,
+      "retrieved": 0,
+      "missed": 9,
+      "recall_pct": 0.0
+    }
+  },
+  "source_recall": {
+    "S2": {
+      "total": 5384,
+      "retrieved": 4605,
+      "missed": 779,
+      "recall_pct": 85.53
+    },
+    "S3": {
+      "total": 5705,
+      "retrieved": 4380,
+      "missed": 1325,
+      "recall_pct": 76.77
+    }
+  },
+  "method_contributions": {
+    "exact_name": {
+      "gt_pairs_retrieved": 2439,
+      "recall_contribution_pct": 21.99,
+      "unique_hits": 136
+    },
+    "token_name": {
+      "gt_pairs_retrieved": 7531,
+      "recall_contribution_pct": 67.91,
+      "unique_hits": 516
+    },
+    "fuzzy_name": {
+      "gt_pairs_retrieved": 7939,
+      "recall_contribution_pct": 71.59,
+      "unique_hits": 948
+    },
+    "address": {
+      "gt_pairs_retrieved": 981,
+      "recall_contribution_pct": 8.85,
+      "unique_hits": 202
+    },
+    "country": {
+      "gt_pairs_retrieved": 784,
+      "recall_contribution_pct": 7.07,
+      "unique_hits": 6
+    },
+    "embedding_ann": {
+      "gt_pairs_retrieved": 0,
+      "recall_contribution_pct": 0.0,
+      "unique_hits": 0
+    }
+  },
+  "address_recovery": {
+    "both_address_available": {
+      "total": 10602,
+      "retrieved": 8540,
+      "missed": 2062
+    },
+    "either_address_missing": {
+      "total": 487,
+      "retrieved": 445,
+      "missed": 42
+    },
+    "address_method_only_retrieved": 69,
+    "unretrieved_despite_both_address_available": 728
+  },
+  "missed_categories": {
+    "Intra-Script + Low Lexical Similarity / Truncation": 1334,
+    "Cross-Script + Low Address Token Overlap / Truncation": 728,
+    "Intra-Script + Missing Address": 42
+  },
+  "missed_samples": [
+    {
+      "s1_id": "S1-979153386",
+      "s1_name": "South Agro Private Limited",
+      "s1_addr": "3Rd Floor, Fl-4A, 5, Deshbandhu Road, (E) Lp-425, Kolkata, Parganas North, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S3-25436171",
+      "target_name": "South Agro Private",
+      "target_addr": "#3Rd Flobr, Fl-4a, 5, Deshbandhu Road, (E) Lp-425, Calcutta, Parganas North, WB",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-979153386",
+      "s1_name": "South Agro Private Limited",
+      "s1_addr": "3Rd Floor, Fl-4A, 5, Deshbandhu Road, (E) Lp-425, Kolkata, Parganas North, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S2-223712261",
+      "target_name": "সাউথ অ্যাগ্রো প্রাইভেট লিমিটেড",
+      "target_addr": "NO 3RD. FLOOR, PARGANAS NORTH, KOLKATA, West Bengal",
+      "target_script": "Bengali",
+      "category": "Cross-Script + Low Address Token Overlap / Truncation"
+    },
+    {
+      "s1_id": "S1-979153386",
+      "s1_name": "South Agro Private Limited",
+      "s1_addr": "3Rd Floor, Fl-4A, 5, Deshbandhu Road, (E) Lp-425, Kolkata, Parganas North, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S3-608474040",
+      "target_name": "South Agro Private Ltd",
+      "target_addr": "#3Rd Floor, Fl-4a, 5, Deshbandhu Road, (E) Lp-425, Parganas North, Calcutta, পশ্চিমবঙ্গ",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-165705804",
+      "s1_name": "City Foundation Private Limited",
+      "s1_addr": "G-23, Sector 27, Noida, Gautam Buddha Nagar, Uttar Pradesh",
+      "s1_script": "Latin",
+      "target_id": "S3-896961717",
+      "target_name": "City Foundation Private Ltd",
+      "target_addr": "G-23, Gautam Buddha Nagar, उत्तर प्रदेश",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-165705804",
+      "s1_name": "City Foundation Private Limited",
+      "s1_addr": "G-23, Sector 27, Noida, Gautam Buddha Nagar, Uttar Pradesh",
+      "s1_script": "Latin",
+      "target_id": "S2-514071979",
+      "target_name": "सिटी फाउंडेशन प्राइवेट लिमिटेड",
+      "target_addr": "G-23, NOIDA, GAUTAM BUDDHA NAGAR, Uttar Pradesh",
+      "target_script": "Devanagari",
+      "category": "Cross-Script + Low Address Token Overlap / Truncation"
+    },
+    {
+      "s1_id": "S1-165705804",
+      "s1_name": "City Foundation Private Limited",
+      "s1_addr": "G-23, Sector 27, Noida, Gautam Buddha Nagar, Uttar Pradesh",
+      "s1_script": "Latin",
+      "target_id": "S3-584691215",
+      "target_name": "City Founadson Private Limited",
+      "target_addr": "Noida, Sector 27, Gautam Buddha Nagar, G-23, UP",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-889323631",
+      "s1_name": "Sr Save",
+      "s1_addr": "# 5-3-496, 2Nd Floor, Bhandari House, Old Tope Khana Road, Begum Bazar, Osmangunj, Hyderabad, Telangana",
+      "s1_script": "Latin",
+      "target_id": "S3-11176670",
+      "target_name": "Zetadrex",
+      "target_addr": "#5-3-496, Sangareddy, 2Nd Floor, Bhandari House, Old Tope Khana Road, Begum Bazar, Osmangunj, Hyderabad, Andhra Pradesh",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-806385002",
+      "s1_name": "Dynamic Staffing Dynamics Center",
+      "s1_addr": "Brightwood, OR, 62706 Barlow Trail Road",
+      "s1_script": "Latin",
+      "target_id": "S3-549394351",
+      "target_name": "sddynamics.com",
+      "target_addr": "62706 Barlow Trail Rd, Brightwood, Oregon",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-427391715",
+      "s1_name": "Williams Rapid Nexus Inc",
+      "s1_addr": "3426 Sollers Point Road, Dundalk, MD",
+      "s1_script": "Latin",
+      "target_id": "S3-75316919",
+      "target_name": "rapidwilliamsnexus.com - 2517993893",
+      "target_addr": "3426 Sollers Point Road, Dundalk CITY, Maryland",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-162804680",
+      "s1_name": "ZU Mills Pvt Ltd",
+      "s1_addr": "Survey No.287/2, Yadunandan Farm Pirana, At Pirana Ta: Daskroi, Giramtha, Ahmedabad, Gujarat",
+      "s1_script": "Latin",
+      "target_id": "S2-189068715",
+      "target_name": "zumills.com",
+      "target_addr": "SURVEY NO.287/2, YADUNANDAN FARM PIRANA, AT PIRANA TA: DASKROI, GIRAMTHA, AHMEDABAD, ગુજરાત",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-198479814",
+      "s1_name": "WLA Security Private Limited",
+      "s1_addr": "Fl No-D1-1003, Sr No-284, 1B 2 3, Pride Aashiyana, Pune City, Pune, Maharashtra",
+      "s1_script": "Latin",
+      "target_id": "S3-671159773",
+      "target_name": "WLA Limited Private-Security",
+      "target_addr": "Fl No-d1-1003, Sr No-284, 1B 2 3, Pride Aashiyana, Pune City, Pune, महाराष्ट्र",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-198479814",
+      "s1_name": "WLA Security Private Limited",
+      "s1_addr": "Fl No-D1-1003, Sr No-284, 1B 2 3, Pride Aashiyana, Pune City, Pune, Maharashtra",
+      "s1_script": "Latin",
+      "target_id": "S2-461493919",
+      "target_name": "wlasecurity.com",
+      "target_addr": "Maharashtra, FL NO-D1-1003, SR NO-284, 1B 2 3, PRIDE AASHIYANA, PUNE CITY",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-91999143",
+      "s1_name": "Lowe Galata LLC",
+      "s1_addr": "22 Connecticut Avenue, Stonington, CT",
+      "s1_script": "Latin",
+      "target_id": "S3-649460113",
+      "target_name": "Galatalowe.Com",
+      "target_addr": "22 Connecticut Avenue, Stonington, Connecticut",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-77107387",
+      "s1_name": "GCA India Private Limited",
+      "s1_addr": "Siddharth Towers, S. No. 12/3-B, Office 908 To 910, Pune City, Pune, Maharashtra",
+      "s1_script": "Latin",
+      "target_id": "S3-76219928",
+      "target_name": "GCA India Private",
+      "target_addr": "No. 63 Siddharth Towers, S. No. 12/3-B, Office 908 To 910, Pune City, Kothrud, MH",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-77107387",
+      "s1_name": "GCA India Private Limited",
+      "s1_addr": "Siddharth Towers, S. No. 12/3-B, Office 908 To 910, Pune City, Pune, Maharashtra",
+      "s1_script": "Latin",
+      "target_id": "S3-210048497",
+      "target_name": "GCA India Private",
+      "target_addr": "No. 63 Siddharth Towers, S. No. 12/3-B, Office 908 To 910, Pune City, Kothrud, महाराष्ट्र",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-575214659",
+      "s1_name": "Iris Rim (India) Private Limited",
+      "s1_addr": "Chandrappa Mudali Street, No. 9, Sowcarpet, Chennai, Tamil Nadu",
+      "s1_script": "Latin",
+      "target_id": "S3-769235627",
+      "target_name": "M/s Iris Rim Private Limited Service",
+      "target_addr": "Door No 9., Chandrappa Mudali Street, Sowcarpet, Chennai, TN",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-812766290",
+      "s1_name": "DTJ Healthcare Pvt Ltd",
+      "s1_addr": "3Rd Floor, Shop No 83 B, New Anaj Mandi Nearmandir, Hisar, Haryana",
+      "s1_script": "Latin",
+      "target_id": "S3-484012891",
+      "target_name": "Dtjhealthcare.Com",
+      "target_addr": "H.no 3Rd Floor, Shop No 83 B, New Anaj Mandi Nearmandir, Hisar, हरियाणा",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-110716088",
+      "s1_name": "New Delhi Kuries Private Limited",
+      "s1_addr": "South Delhi, Ntpc Bhawan Core-7Scope Complex 7 Institutional Arealodi Road, New Delhi, Delhi",
+      "s1_script": "Latin",
+      "target_id": "S3-484141137",
+      "target_name": "New Delhi Kuries-Private Ltd",
+      "target_addr": "Ntpc Bhawan Core-7scope Complex 7 Institutional Arealodi Road, South Delhi, New Delhi, DL",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-110716088",
+      "s1_name": "New Delhi Kuries Private Limited",
+      "s1_addr": "South Delhi, Ntpc Bhawan Core-7Scope Complex 7 Institutional Arealodi Road, New Delhi, Delhi",
+      "s1_script": "Latin",
+      "target_id": "S3-124287222",
+      "target_name": "New Delhi Kuries  Private Ltd",
+      "target_addr": "South Delhi, New Delhi, Ntpc Bhawan Core-7scope Complex 7 Institutional Arealodi Road, DL",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-110716088",
+      "s1_name": "New Delhi Kuries Private Limited",
+      "s1_addr": "South Delhi, Ntpc Bhawan Core-7Scope Complex 7 Institutional Arealodi Road, New Delhi, Delhi",
+      "s1_script": "Latin",
+      "target_id": "S3-925386792",
+      "target_name": "New Delhi Kuries Private",
+      "target_addr": "Ntpc Bhawan Core-7scope. Complex 7 Institutional Arealodi Road, South Delhi, DL",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-110716088",
+      "s1_name": "New Delhi Kuries Private Limited",
+      "s1_addr": "South Delhi, Ntpc Bhawan Core-7Scope Complex 7 Institutional Arealodi Road, New Delhi, Delhi",
+      "s1_script": "Latin",
+      "target_id": "S3-252487195",
+      "target_name": "New Delhi Private Limited Center",
+      "target_addr": "Ntpc Bhawan Core-7scope Complex 7 Institutional Arealodi Road, New Delhi, South Delhi, DL",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-843238200",
+      "s1_name": "Vinayaka Hospital Partners",
+      "s1_addr": "Door No 953, Avinashi Road, Coimbatore South, Coimbatore, Tamil Nadu",
+      "s1_script": "Latin",
+      "target_id": "S3-11599148",
+      "target_name": "phvinayaka.com",
+      "target_addr": "TN, Door No 953, Coimbatore, Coimbatore South",
+      "target_script": "Latin",
+      "category": "Intra-Script + Low Lexical Similarity / Truncation"
+    },
+    {
+      "s1_id": "S1-628608527",
+      "s1_name": "Hotel Infrastructure Private Limited",
+      "s1_addr": "19, Amratolla Street, Kolkata, Kolkata, Howrah, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S3-669037006",
+      "target_name": "হোটেল ইনফ্রাস্ট্রাকচার প্রাইভেট লিমিটেড",
+      "target_addr": "19, Amratolla Street, Kolkata, Kolkata, পশ্চিমবঙ্গ",
+      "target_script": "Bengali",
+      "category": "Cross-Script + Low Address Token Overlap / Truncation"
+    },
+    {
+      "s1_id": "S1-628608527",
+      "s1_name": "Hotel Infrastructure Private Limited",
+      "s1_addr": "19, Amratolla Street, Kolkata, Kolkata, Howrah, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S2-376252927",
+      "target_name": "হোটেল ইনফ্রাস্ট্রাকচার প্রাইভেট লিমিটেড",
+      "target_addr": "79, AMRATOLLA STREET, KOLKATA, KOLKATA, HOWRAH, পশ্চিমবঙ্গ",
+      "target_script": "Bengali",
+      "category": "Cross-Script + Low Address Token Overlap / Truncation"
+    },
+    {
+      "s1_id": "S1-628608527",
+      "s1_name": "Hotel Infrastructure Private Limited",
+      "s1_addr": "19, Amratolla Street, Kolkata, Kolkata, Howrah, West Bengal",
+      "s1_script": "Latin",
+      "target_id": "S2-957109705",
+      "target_name": "হোটেল ইনফ্রাস্ট্রাকচার প্রাইভেট লিমিটেড",
+      "target_addr": "AMRATOLLA STREET, KOLKATA, KOLKATA, West Bengal, HOWRAH, 79",
+      "target_script": "Bengali",
+      "category": "Cross-Script + Low Address Token Overlap / Truncation"
+    }
+  ],
+  "france_audit": {
+    "test_s1_france_rows": 259452,
+    "test_s2_france_rows": 703378,
+    "test_s3_france_rows": 731615,
+    "total_france_records": 1694445,
+    "france_name_missing": 0,
+    "france_address_missing": 43078,
+    "france_name_scripts": {
+      "Latin": 1694445
+    },
+    "france_accent_records": 633806,
+    "french_legal_suffixes": {
+      "sarl": 358676,
+      "eurl": 100795,
+      "societe": 22105,
+      "sas": 252882,
+      "sa": 82273,
+      "sci": 63630,
+      "etablissement": 1797,
+      "société": 12,
+      "snc": 14764
+    },
+    "french_address_terms": {
+      "boulevard": 38275,
+      "rue": 728582,
+      "avenue": 126497,
+      "impasse": 21102,
+      "chemin": 15239,
+      "bd": 25271,
+      "place": 13363,
+      "allée": 34298,
+      "route": 17932,
+      "passage": 3167,
+      "av": 57361,
+      "za": 44,
+      "zi": 11,
+      "bvd": 73
+    }
+  },
+  "classifier_validation_report": {
+    "Latin vs Latin": {
+      "positives": 997,
+      "true_positives": 991,
+      "false_positives": 104,
+      "false_negatives": 6,
+      "precision": 0.905,
+      "recall": 0.994,
+      "f05_score": 0.9215
+    },
+    "Latin vs Devanagari": {
+      "positives": 27,
+      "true_positives": 27,
+      "false_positives": 4,
+      "false_negatives": 0,
+      "precision": 0.871,
+      "recall": 1.0,
+      "f05_score": 0.894
+    },
+    "Latin vs Tamil": {
+      "positives": 2,
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f05_score": 1.0
+    },
+    "Latin vs Gujarati": {
+      "positives": 1,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f05_score": 0.0
+    },
+    "Latin vs Telugu": {
+      "positives": 7,
+      "true_positives": 7,
+      "false_positives": 2,
+      "false_negatives": 0,
+      "precision": 0.7778,
+      "recall": 1.0,
+      "f05_score": 0.814
+    },
+    "Latin vs Kannada": {
+      "positives": 1,
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f05_score": 1.0
+    },
+    "Latin vs Malayalam": {
+      "positives": 2,
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f05_score": 1.0
+    },
+    "Latin vs Gurmukhi": {
+      "positives": 1,
+      "true_positives": 1,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f05_score": 1.0
+    },
+    "Latin vs Bengali": {
+      "positives": 4,
+      "true_positives": 4,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f05_score": 1.0
+    }
+  }
+}

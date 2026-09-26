@@ -4,3 +4,5 @@ scikit-learn==1.4.1.post1
 # Install faiss-cpu on supported CPU environments, or a compatible FAISS GPU build
 # on the RTX workstation after validating CUDA/runtime compatibility.
 faiss-cpu>=1.8.0
+# Optional multilingual retrieval backend; enable only after model/license/resource validation.
+# sentence-transformers>=3.0.0

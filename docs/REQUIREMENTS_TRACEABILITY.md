@@ -247,3 +247,6 @@ The following are authoritative narrative constraints, not FR IDs; they are inte
 - No ranges, inferred FR IDs, or status claims of completed testing are used.
 - A future audit can compare the first column directly with SRS requirement-definition IDs and inspect each named planned artifact/pass criterion.
 
+## Multilingual extension traceability addendum
+
+The multilingual retrieval family is an implementation extension, not a change to the official SRS functional contract. It is traced to the existing candidate-generation, provenance, feature-schema, checkpoint, evaluation, resource, and reproducibility rows above. The implementation evidence is `src/core.py`, `src/cli.py`, `config/default.json`, and `tests/test_pipeline.py`. Full semantic quality remains pending installation/license/resource validation of the configured pretrained model and a labeled benchmark.

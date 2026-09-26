@@ -10,6 +10,7 @@ def paths(data,split):
  if split=='train':p['truth']=root/'train_ground_truth.tsv'
  return p
 def cfg(path): return json.loads(Path(path).read_text())
+def candidate_config(c): return {'retrieval':c['retrieval'],'embedding':c.get('embedding',{}),'multilingual':c.get('multilingual',{})}
 def normalized(data,split,art,sample=None):
  d,rep=validation_report(paths(data,split),Path(art)/'validation'/f'{split}.json',sample)
  store=CheckpointStore(Path(art)/'recovery'/split,{'input_hash':rep['fingerprint'],'preprocess':'nfkc-casefold-v1','sample':sample})
@@ -17,7 +18,7 @@ def normalized(data,split,art,sample=None):
  store.run('normalized','s1',lambda:d['s1']); store.run('normalized','targets',lambda:d['s2']+d['s3'])
  return d,rep
 def index_for(data,split,art,c,sample=None):
- d,rep=normalized(data,split,art,sample); retrieval_config={'retrieval':c['retrieval'],'embedding':c.get('embedding',{})}; h=stable_hash({'input':rep['fingerprint'],'config':retrieval_config,'version':VERSION}); path=Path(art)/'indexes'/split/(h+'.pkl'); expected={'input_hash':rep['fingerprint'],'preprocess_hash':stable_hash('nfkc-casefold-v1'),'config_hash':stable_hash(retrieval_config)}
+ d,rep=normalized(data,split,art,sample); retrieval_config=candidate_config(c); h=stable_hash({'input':rep['fingerprint'],'config':retrieval_config,'version':VERSION}); path=Path(art)/'indexes'/split/(h+'.pkl'); expected={'input_hash':rep['fingerprint'],'preprocess_hash':stable_hash('nfkc-casefold-v1'),'config_hash':stable_hash(retrieval_config)}
  if path.exists():
   try: return d,Index.load(path,expected),h
   except (ValueError,OSError,EOFError,pickle.UnpicklingError):
@@ -28,7 +29,7 @@ def index_for(data,split,art,c,sample=None):
  idx=Index(d['s2']+d['s3'],c); idx.save(path,expected); return d,idx,h
 def run_train(a):
  c=cfg(a.config); assert_capacity(a.artifacts,c['resources']); d,idx,h=index_for(a.data,'train',a.artifacts,c,a.sample); base=Path(a.artifacts)/'experiments'/a.experiment
- lineage={'input_hash':stable_hash([x['entity_id'] for x in d['s1']]),'index_hash':h,'candidate_config':{'retrieval':c['retrieval'],'embedding':c.get('embedding',{})},'schema_hash':schema_manifest()['schema_hash'],'training_config':{'seed':c['seed'],'validation_fraction':c['validation_fraction'],'negative_ratio':c['negative_ratio'],'model':c['model']},'run':'train'}; store=CheckpointStore(base/'recovery',lineage)
+ lineage={'input_hash':stable_hash([x['entity_id'] for x in d['s1']]),'index_hash':h,'candidate_config':candidate_config(c),'schema_hash':schema_manifest()['schema_hash'],'training_config':{'seed':c['seed'],'validation_fraction':c['validation_fraction'],'negative_ratio':c['negative_ratio'],'model':c['model']},'run':'train'}; store=CheckpointStore(base/'recovery',lineage)
  rows=resumable_candidates(d['s1'],idx,store,c['batch_size'],c['resources'].get('candidate_method_workers',1)); feats=resumable_features(rows,d['s1'],idx.targets,store,c['batch_size'])
  splitrows=store.run('training_prep','split',lambda:[{'kind':'train','id':x} for x in sorted(split_ids([x['entity_id'] for x in d['s1']],d['truth'],c['validation_fraction'],c['seed'])[0])]+[{'kind':'validation','id':x} for x in sorted(split_ids([x['entity_id'] for x in d['s1']],d['truth'],c['validation_fraction'],c['seed'])[1])])
  train_ids={x['id'] for x in splitrows if x['kind']=='train'}; val_ids={x['id'] for x in splitrows if x['kind']=='validation'}
@@ -48,11 +49,11 @@ def run_train(a):
   score=macro_f05(pred,{i:d['truth'][i] for i in val_ids})
   if score>best[0]:best=(score,t,pred)
  atomic_pickle(base/'model.pkl',model,store.lineage)
- manifest={'version':VERSION,'schema':schema_manifest(),'threshold':best[1],'validation_macro_f05':best[0],'candidate_config_hash':stable_hash({'retrieval':c['retrieval'],'embedding':c.get('embedding',{})}),'index_hash':h,'config':c,'matrix_storage':{'dtype':'float32','train_rows':len(tr),'validation_rows':len(va),'feature_count':len(FEATURES),'train_bytes':len(tr)*len(FEATURES)*4,'validation_bytes':len(va)*len(FEATURES)*4,'out_of_core':False},'created_at':time.time()}; atomic_json(base/'model_manifest.json',manifest); atomic_json(base/'threshold_sweep.json',{'selected_threshold':best[1],'selected_macro_f05':best[0]}); print(json.dumps(manifest,indent=2))
+ manifest={'version':VERSION,'schema':schema_manifest(),'threshold':best[1],'validation_macro_f05':best[0],'candidate_config_hash':stable_hash(candidate_config(c)),'index_hash':h,'config':c,'matrix_storage':{'dtype':'float32','train_rows':len(tr),'validation_rows':len(va),'feature_count':len(FEATURES),'train_bytes':len(tr)*len(FEATURES)*4,'validation_bytes':len(va)*len(FEATURES)*4,'out_of_core':False},'created_at':time.time()}; atomic_json(base/'model_manifest.json',manifest); atomic_json(base/'threshold_sweep.json',{'selected_threshold':best[1],'selected_macro_f05':best[0]}); print(json.dumps(manifest,indent=2))
 def run_infer(a):
  c=cfg(a.config); assert_capacity(a.artifacts,c['resources']); base=Path(a.artifacts)/'experiments'/a.experiment; man=json.loads((base/'model_manifest.json').read_text());
- if man['schema']['schema_hash']!=schema_manifest()['schema_hash'] or man['candidate_config_hash']!=stable_hash({'retrieval':c['retrieval'],'embedding':c.get('embedding',{})}):raise ValueError('model/config/schema compatibility failure')
- d,idx,h=index_for(a.data,'test',a.artifacts,c,a.sample); store=CheckpointStore(Path(a.artifacts)/'runs'/f'inference_{a.experiment}'/'recovery',{'input_hash':stable_hash([x['entity_id'] for x in d['s1']]),'index_hash':h,'candidate_config':{'retrieval':c['retrieval'],'embedding':c.get('embedding',{})},'schema_hash':schema_manifest()['schema_hash'],'model':file_hash(base/'model.pkl')})
+ if man['schema']['schema_hash']!=schema_manifest()['schema_hash'] or man['candidate_config_hash']!=stable_hash(candidate_config(c)):raise ValueError('model/config/schema compatibility failure')
+ d,idx,h=index_for(a.data,'test',a.artifacts,c,a.sample); store=CheckpointStore(Path(a.artifacts)/'runs'/f'inference_{a.experiment}'/'recovery',{'input_hash':stable_hash([x['entity_id'] for x in d['s1']]),'index_hash':h,'candidate_config':candidate_config(c),'schema_hash':schema_manifest()['schema_hash'],'model':file_hash(base/'model.pkl')})
  with (base/'model.pkl').open('rb') as f:model=pickle.load(f)
  out=Path(a.output); stage=out/'staging'; stage.mkdir(parents=True,exist_ok=True)
  mt,ct=stage/'matching_results.tsv.tmp',stage/'candidate_pairs.tsv.tmp'; total=0

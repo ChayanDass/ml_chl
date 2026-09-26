@@ -1,0 +1,558 @@
+{
+  "total_s1_entities": 2206821,
+  "match_counts_distribution": {
+    "5": 321957,
+    "4": 484115,
+    "3": 530841,
+    "6": 164868,
+    "2": 375212,
+    "7": 63968,
+    "0": 123247,
+    "1": 119157,
+    "8": 18680,
+    "9": 4205,
+    "10": 534,
+    "11": 37
+  },
+  "singletons_count": 123247,
+  "singletons_percent": 5.58,
+  "total_matched_pairs": 7638365,
+  "script_pairs": {
+    "Latin vs Latin": 7087125,
+    "Latin vs Tamil": 39252,
+    "Latin vs Devanagari": 312725,
+    "Latin vs Telugu": 45620,
+    "Latin vs Kannada": 43379,
+    "Latin vs Bengali": 35910,
+    "Latin vs Malayalam": 21930,
+    "Latin vs Odia": 8681,
+    "Latin vs Gujarati": 35819,
+    "Latin vs Gurmukhi": 7924
+  },
+  "exact_name_matches": 821025,
+  "exact_name_match_percent": 10.75,
+  "exact_addr_matches": 553282,
+  "exact_addr_match_percent": 7.24,
+  "country_agreements": 7638365,
+  "country_disagreements": 0,
+  "country_agreement_percent": 100.0,
+  "token_jaccard_buckets": {
+    "0.5 - 0.79 (Medium)": 3574834,
+    "< 0.2 (Very Low)": 1263763,
+    "1.0 (Exact)": 1573518,
+    "0.8 - 0.99 (High)": 268437,
+    "0.2 - 0.49 (Low)": 957813
+  },
+  "difflib_buckets_sample_50k": {
+    "0.8 - 0.99 (High)": 26310,
+    "0.5 - 0.79 (Medium)": 12653,
+    "1.0 (Exact)": 5406,
+    "0.2 - 0.49 (Low)": 1344,
+    "< 0.2 (Very Low)": 3934
+  },
+  "transliteration_examples": [
+    {
+      "s1_id": "S1-55344266",
+      "s1_name": "Raj Investments LLP",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-249013014",
+      "target_name": "ராஜ் இன்வெஸ்ட்மெண்ட்ஸ் எல்எல்பி",
+      "target_script": "Tamil",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-55344266",
+      "s1_name": "Raj Investments LLP",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-478195123",
+      "target_name": "Raj Investments எல்எல்பி",
+      "target_script": "Tamil",
+      "target_country": "India",
+      "token_jaccard": 0.5
+    },
+    {
+      "s1_id": "S1-55344266",
+      "s1_name": "Raj Investments LLP",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-384364074",
+      "target_name": "ராஜ் இன்வெஸ்ட்மெண்ட்ஸ் எல்எல்பி",
+      "target_script": "Tamil",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-656753428",
+      "s1_name": "Ss Food Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-153058913",
+      "target_name": "एसएस फूड प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-656753428",
+      "s1_name": "Ss Food Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-24659151",
+      "target_name": "एसएस फूड प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-656753428",
+      "s1_name": "Ss Food Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-679606215",
+      "target_name": "एसएस फूड प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-318373630",
+      "s1_name": "Red Ventures Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-660036492",
+      "target_name": "रेड वेंचर्स प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-789009573",
+      "s1_name": "Hotel Enterprises Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-383871912",
+      "target_name": "होटल एंटरप्राइजेज लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-561341312",
+      "s1_name": "Balaji Investment Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-483615364",
+      "target_name": "బాలాజీ ఇన్వెస్ట్‌మెంట్ ప్రైవేట్ లిమిటెడ్",
+      "target_script": "Telugu",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-727602285",
+      "s1_name": "Swastik Om Solutions LLP",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-976870196",
+      "target_name": "स्वस्तिक ॐ सॉल्यूशंस एलएलपी",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-727602285",
+      "s1_name": "Swastik Om Solutions LLP",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-947230367",
+      "target_name": "स्वस्तिक ॐ सॉल्यूशंस एलएलपी",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-72444401",
+      "s1_name": "New Solutions",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-973800896",
+      "target_name": "न्यू सॉल्यूशंस",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-72444401",
+      "s1_name": "New Solutions",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-503949813",
+      "target_name": "न्यू सॉल्यूशंस",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-72444401",
+      "s1_name": "New Solutions",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-505153321",
+      "target_name": "न्यू सॉल्यूशंस",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-152222475",
+      "s1_name": "Ram Maa Logistics Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-449137844",
+      "target_name": "राम मां लॉजिस्टिक्स प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-816256578",
+      "s1_name": "Sun Software Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-58277947",
+      "target_name": "सन सॉफ्टवेयर लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-502736054",
+      "s1_name": "First Seven Exports Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-537652714",
+      "target_name": "फर्स्ट सेवन एक्सपोर्ट्स प्रा. लि.",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-649259801",
+      "s1_name": "Guru Solutions Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-654066445",
+      "target_name": "ಗುರು ಸೊಲ್ಯೂಷನ್ಸ್ ಪ್ರೈವೇಟ್ ಲಿಮಿಟೆಡ್",
+      "target_script": "Kannada",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-927655670",
+      "s1_name": "Jain Marketing Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-226884833",
+      "target_name": "जैन मार्केटिंग प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-216137765",
+      "s1_name": "Gold Projects Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-190915441",
+      "target_name": "ಗೋಲ್ಡ್ ಪ್ರಾಜೆಕ್ಟ್ಸ್ ಪ್ರೈವೇಟ್ ಲಿಮಿಟೆಡ್",
+      "target_script": "Kannada",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-216137765",
+      "s1_name": "Gold Projects Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-680612609",
+      "target_name": "ಗೋಲ್ಡ್ ಪ್ರಾಜೆಕ್ಟ್ಸ್ ಪ್ರೈವೇಟ್ ಲಿಮಿಟೆಡ್",
+      "target_script": "Kannada",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-216137765",
+      "s1_name": "Gold Projects Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S2-904465183",
+      "target_name": "ಗೋಲ್ಡ್ ಪ್ರಾಜೆಕ್ಟ್ಸ್ ಪ್ರೈವೇಟ್ ಲಿಮಿಟೆಡ್",
+      "target_script": "Kannada",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-216137765",
+      "s1_name": "Gold Projects Pvt Ltd",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-818304481",
+      "target_name": "ಗೋಲ್ಡ್ ಪ್ರಾಜೆಕ್ಟ್ಸ್ ಪ್ರೈವೇಟ್ ಲಿಮಿಟೆಡ್",
+      "target_script": "Kannada",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-9455909",
+      "s1_name": "Seven Sun Producer Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-384632970",
+      "target_name": "सेवन सन प्रोड्यूसर प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-9455909",
+      "s1_name": "Seven Sun Producer Private Limited",
+      "s1_script": "Latin",
+      "s1_country": "India",
+      "target_id": "S3-133372803",
+      "target_name": "सेवन सन प्रोड्यूसर प्राइवेट लिमिटेड",
+      "target_script": "Devanagari",
+      "target_country": "India",
+      "token_jaccard": 0.0
+    }
+  ],
+  "country_mismatch_examples": [],
+  "low_sim_matched_examples": [
+    {
+      "s1_id": "S1-965667",
+      "s1_name": "Maure Williams Colombier Inc",
+      "s1_script": "Latin",
+      "target_id": "S3-775321672",
+      "target_name": "Dréxkor",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-965667",
+      "s1_name": "Maure Williams Colombier Inc",
+      "s1_script": "Latin",
+      "target_id": "S3-11291185",
+      "target_name": "maurewilliamscolombier.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-102811957",
+      "s1_name": "Payne Enterprises",
+      "s1_script": "Latin",
+      "target_id": "S2-625774905",
+      "target_name": "PAYNE-ENRTPRMISES",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-274126313",
+      "s1_name": "Obsidian, LLC",
+      "s1_script": "Latin",
+      "target_id": "S2-736616474",
+      "target_name": "Obsidian,-LLC",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-777597828",
+      "s1_name": "Uptown Pub",
+      "s1_script": "Latin",
+      "target_id": "S3-413669121",
+      "target_name": "Solkeloquo",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-840162906",
+      "s1_name": "Summit Health LLC",
+      "s1_script": "Latin",
+      "target_id": "S3-799520471",
+      "target_name": "summithealth.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-567308588",
+      "s1_name": "Zander Blue Co",
+      "s1_script": "Latin",
+      "target_id": "S2-191200521",
+      "target_name": "zblue.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-567308588",
+      "s1_name": "Zander Blue Co",
+      "s1_script": "Latin",
+      "target_id": "S3-21806256",
+      "target_name": "zanderblue.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-567308588",
+      "s1_name": "Zander Blue Co",
+      "s1_script": "Latin",
+      "target_id": "S3-764465670",
+      "target_name": "ZB",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-292935703",
+      "s1_name": "Cozy Grill",
+      "s1_script": "Latin",
+      "target_id": "S2-195749344",
+      "target_name": "gcozy.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-525304403",
+      "s1_name": "True Factory Ltd",
+      "s1_script": "Latin",
+      "target_id": "S2-293401164",
+      "target_name": "truefactory.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-314714647",
+      "s1_name": "Seabird (India) Projects-Lucknow",
+      "s1_script": "Latin",
+      "target_id": "S3-192802051",
+      "target_name": "Xylonexbrix",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-72310418",
+      "s1_name": "Burger Solution Limited",
+      "s1_script": "Latin",
+      "target_id": "S3-731160199",
+      "target_name": "Burgersolution.Com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-9962387",
+      "s1_name": "Systel Buildstructure (India) Private Limited",
+      "s1_script": "Latin",
+      "target_id": "S3-160760047",
+      "target_name": "systelbuildstructureindia.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-473377609",
+      "s1_name": "Wave & Brothers Ltd",
+      "s1_script": "Latin",
+      "target_id": "S3-433876173",
+      "target_name": "Belobrixlum",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-225984658",
+      "s1_name": "Alaine's Fitness",
+      "s1_script": "Latin",
+      "target_id": "S2-355430647",
+      "target_name": "alainesfitness.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-686913759",
+      "s1_name": "Behavioral Health Clinic",
+      "s1_script": "Latin",
+      "target_id": "S2-584238851",
+      "target_name": "BEHAVIORALHEALTHCLINIC.COM",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-957102563",
+      "s1_name": "Vadodara Industries Pvt Ltd",
+      "s1_script": "Latin",
+      "target_id": "S3-368033022",
+      "target_name": "vadodaraindustries.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-693111833",
+      "s1_name": "Viraaj Brokerage (India) Corporation",
+      "s1_script": "Latin",
+      "target_id": "S2-540189532",
+      "target_name": "Shri VIRAAJBROKERAGEINDIA.COM",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-244810289",
+      "s1_name": "Celestial Memorial Trust",
+      "s1_script": "Latin",
+      "target_id": "S3-742580559",
+      "target_name": "celestialmemorialtrust.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-561619160",
+      "s1_name": "Hutcherson Investments",
+      "s1_script": "Latin",
+      "target_id": "S2-453284266",
+      "target_name": "Novinoviaria",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-553375105",
+      "s1_name": "Kozlowski, Lopez & Smith LLC",
+      "s1_script": "Latin",
+      "target_id": "S2-81940621",
+      "target_name": "Ciralumyuma",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-553375105",
+      "s1_name": "Kozlowski, Lopez & Smith LLC",
+      "s1_script": "Latin",
+      "target_id": "S3-150800481",
+      "target_name": "lopezkozlowski.com",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-161556164",
+      "s1_name": "ZA Buildwell Private Limited",
+      "s1_script": "Latin",
+      "target_id": "S3-91054277",
+      "target_name": "ZB",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    },
+    {
+      "s1_id": "S1-389414274",
+      "s1_name": "Benzer Intelli Group",
+      "s1_script": "Latin",
+      "target_id": "S3-993901020",
+      "target_name": "Benzer-Intelli",
+      "target_script": "Latin",
+      "token_jaccard": 0.0
+    }
+  ]
+}

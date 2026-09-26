@@ -1,0 +1,7 @@
+source_split,total_rows,empty_name_count,empty_addr_count,empty_country_count,control_char_records,mojibake_suspicious_records
+train_s1,2206821,0,0,0,69,453
+train_s2,5034616,0,168967,0,118,1118
+train_s3,5285603,0,175916,0,125,800
+test_s1,1732544,0,0,0,72,405
+test_s2,4887273,0,129408,0,183,4046
+test_s3,5082316,0,136098,0,162,871

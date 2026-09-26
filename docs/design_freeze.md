@@ -2390,3 +2390,7 @@ Candidate generation will be evaluated for match recovery and computational effi
 The final configuration will be selected based on recorded validation evidence, retrained on eligible training data, and verified through the official output requirements before submission.
 
 **Final principle:** Every material change must be supported by a reproducible experiment, and the final system must be evaluated as a complete pipeline rather than as a classifier in isolation.
+
+## 14. Multilingual Matching Extension Addendum
+
+The targeted multilingual architecture revision is documented in [MULTILINGUAL_ARCHITECTURE_ADDENDUM.md](MULTILINGUAL_ARCHITECTURE_ADDENDUM.md). It is a **proposed extension pending benchmark validation**, not an approved production change. The six existing candidate-generation families, LightGBM classifier, feature/output contracts, open-valued country handling, entity-level split, and macro-F0.5 objective remain frozen. The addendum defines the proposed script-aware retrieval path, optional validated multilingual features, subgroup validation, France verification requirements, and the evidence required before implementation approval.
