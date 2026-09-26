@@ -39,3 +39,7 @@ Normalization now caches label-independent name/address tokens, name trigrams, a
 ## Partition threading and feature-cache update
 
 Candidate method checkpoints can now use bounded shared-index threads via `resources.candidate_method_workers`; it defaults to 1 because Python process workers would duplicate the workstation-scale index and the lexical/fuzzy loops are largely GIL-bound. Threaded and sequential unions were tested for exact equality. Feature extraction now reuses the same cached tokens and normalized strings rather than re-tokenizing/re-normalizing per pair. A 500-target/200-S1 synthetic feature benchmark measured 1.5155 seconds without record caches and 1.2045 seconds with caches (20.5% faster), with identical feature semantics by construction and regression tests. This is bounded CPU evidence only; worker count should stay at 1 until a workstation profile proves benefit without index-RAM or disk-I/O regressions.
+
+## Laptop optimization phase 1
+
+Checkpoint JSONL serialization no longer sorts every row’s keys or writes optional whitespace; stable constructor ordering preserves deterministic payload content. On 20,000 synthetic candidate-like rows, compact serialization took 0.1392 seconds versus 0.1439 seconds for sorted/default JSON (1.03×) and used 4,186,890 bytes versus 4,526,890 bytes (7.51% less disk). The regression suite remained at fourteen passing tests. Threaded candidate methods remain implemented but not enabled by default because no local workload has demonstrated a reliable wall-clock improvement over sequential execution.

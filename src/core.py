@@ -344,7 +344,9 @@ def train_model(train, valid, model_cfg):
 def write_jsonl(path:Path, rows):
  path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp')
  with tmp.open('w',encoding='utf8') as f:
-  for r in rows:f.write(json.dumps(r,ensure_ascii=False,sort_keys=True)+'\n')
+  # Row constructors use stable field/method order; avoiding key sorting and whitespace
+  # materially lowers JSONL checkpoint CPU and disk traffic without altering payload values.
+  for r in rows:f.write(json.dumps(r,ensure_ascii=False,separators=(',',':'))+'\n')
  os.replace(tmp,path); atomic_json(path.with_suffix('.manifest.json'),{'status':'complete','rows':len(rows),'checksum':file_hash(path),'version':VERSION})
 def read_jsonl(path):
  with path.open(encoding='utf8') as f: return [json.loads(x) for x in f]
