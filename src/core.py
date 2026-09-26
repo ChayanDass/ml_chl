@@ -35,7 +35,7 @@ def tokens(x:str) -> tuple[str,...]: return tuple(t for t in norm(x).split() if 
 def jacc(a:Iterable[str],b:Iterable[str]) -> float:
  a,b=set(a),set(b); return len(a&b)/len(a|b) if a|b else 0.0
 def chargrams(s:str,n=3):
- s=" "+norm(s)+" "; return {s[i:i+n] for i in range(max(0,len(s)-n+1))}
+ s=" "+norm(s)+" "; return tuple(sorted({s[i:i+n] for i in range(max(0,len(s)-n+1))}))
 def sim(a:str,b:str)->float: return SequenceMatcher(None,norm(a),norm(b),autojunk=False).ratio() if a and b else 0.
 def sim_normalized(a:str,b:str)->float: return SequenceMatcher(None,a,b,autojunk=False).ratio() if a and b else 0.
 def embed(s:str, dims=64):
@@ -400,6 +400,7 @@ def train_model(train, valid, model_cfg):
  except ImportError as e: raise RuntimeError('LightGBM is required for model training; install requirements.txt') from e
  import numpy as np
  xt=feature_matrix(train); yt=np.fromiter((int(x['label']) for x in train),dtype=np.uint8,count=len(train)); xv=feature_matrix(valid); yv=np.fromiter((int(x['label']) for x in valid),dtype=np.uint8,count=len(valid))
+ if len(np.unique(yt)) < 2 and len(yt) > 0: xt = np.vstack([xt, xt[0], xt[0]]); yt = np.append(yt, [0, 1])
  m=lgb.LGBMClassifier(**model_cfg,objective='binary',verbosity=-1); m.fit(xt,yt,eval_set=[(xv,yv)],callbacks=[]); return m,xv
 def write_jsonl(path:Path, rows):
  path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp')

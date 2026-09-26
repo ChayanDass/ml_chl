@@ -1,9 +1,9 @@
 {
   "seed": 20260926,
-  "batch_size": 5000,
-  "candidate_partition_size": 5000,
-  "feature_partition_size": 5000,
-  "scoring_partition_size": 5000,
+  "batch_size": 10000,
+  "candidate_partition_size": 10000,
+  "feature_partition_size": 10000,
+  "scoring_partition_size": 10000,
   "validation_fraction": 0.10,
   "negative_ratio": 4,
   "thresholds": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90],
@@ -25,11 +25,11 @@
   "model": {"n_estimators": 300, "learning_rate": 0.05, "num_leaves": 31, "min_child_samples": 20, "random_state": 20260926},
   "resources": {
     "device": "cpu",
-    "workers": 20,
-    "candidate_method_workers": 1,
-    "ram_soft_limit_gb": 96,
-    "ram_hard_limit_gb": 112,
-    "disk_reserve_gb": 80,
+    "workers": 22,
+    "candidate_method_workers": 4,
+    "ram_soft_limit_gb": 110,
+    "ram_hard_limit_gb": 120,
+    "disk_reserve_gb": 40,
     "vram_reserve_gb": 4,
     "gpu_enabled": false
   }

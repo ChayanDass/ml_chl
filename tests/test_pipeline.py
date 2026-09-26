@@ -105,4 +105,13 @@ class PipelineTest(unittest.TestCase):
    atomic_pickle(latest,{'iteration':10},lineage); atomic_pickle(best,{'iteration':7},lineage)
    self.assertEqual(valid_pickle(latest,lineage),{'iteration':10}); self.assertEqual(valid_pickle(best,lineage),{'iteration':7})
    self.assertIsNone(valid_pickle(best,{'experiment':'a','model':'v2'}))
+
+  def test_chargrams_json_serializable(self):
+   grams = chargrams("Acme Inc.")
+   self.assertEqual(type(grams), tuple)
+   try:
+    json.dumps(grams)
+   except TypeError:
+    self.fail("chargrams output is not JSON serializable")
+
 if __name__=='__main__':unittest.main()
