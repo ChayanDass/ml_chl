@@ -7,7 +7,8 @@
   "validation_fraction": 0.10,
   "negative_ratio": 4,
   "thresholds": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90],
-  "retrieval": {"token_limit": 30, "fuzzy_limit": 20, "address_limit": 30, "country_limit": 15, "embedding_limit": 20, "max_postings": 5000},
+  "retrieval": {"token_limit": 30, "fuzzy_limit": 20, "address_limit": 30, "country_limit": 15, "embedding_limit": 20, "multilingual_name_limit": 20, "max_postings": 5000},
+  "multilingual": {"enabled": false, "model": "intfloat/multilingual-e5-small", "device": "cpu", "batch_size": 64, "limit": 20, "min_similarity": 0.0, "index_type": "hnsw", "nlist": 64, "nprobe": 8, "hnsw_m": 32, "ef_construction": 80, "ef_search": 64},
   "embedding": {
     "backend": "faiss_ivfpq",
     "dimensions": 64,

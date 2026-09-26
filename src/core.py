@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import Any, Iterable
 
 REQUIRED=("entity_id","business_name","business_address","country")
-METHODS=("exact_name","token_name","fuzzy_name","address","country","embedding_ann")
-FEATURES=("name_exact","name_token_jaccard","name_char_similarity","name_length_ratio","name_comparable","address_exact","address_token_jaccard","address_char_similarity","address_comparable","country_agree","country_disagree","country_missing","cross_name_address_mean","cross_both_exact","source_s2","source_s3","retrieval_count","exact_name_hit","token_name_hit","fuzzy_name_hit","address_hit","country_hit","embedding_ann_hit","s1_name_missing","candidate_name_missing","s1_address_missing","candidate_address_missing")
-VERSION="1.0.0"
+METHODS=("exact_name","token_name","fuzzy_name","address","country","embedding_ann","multilingual_name")
+FEATURES=("name_exact","name_token_jaccard","name_char_similarity","name_length_ratio","name_comparable","address_exact","address_token_jaccard","address_char_similarity","address_comparable","country_agree","country_disagree","country_missing","cross_name_address_mean","cross_both_exact","source_s2","source_s3","retrieval_count","exact_name_hit","token_name_hit","fuzzy_name_hit","address_hit","country_hit","embedding_ann_hit","multilingual_name_hit","s1_name_missing","candidate_name_missing","s1_address_missing","candidate_address_missing")
+VERSION="1.1.0"
 
 def uint_array(): return array('I')
 
@@ -96,7 +96,7 @@ def validation_report(paths:dict[str,Path], artifact:Path, sample:int|None=None)
 
 class Index:
  def __init__(self, targets:list[dict], config:dict):
-  self.targets={r['entity_id']:r for r in targets}; self.config=config; self.ids=[]; self.maps={k:defaultdict(uint_array) for k in ('name','token','gram','address','country')}; self.vec={}; self.ann=None; self.ann_name=None; self.ann_ids=[]
+  self.targets={r['entity_id']:r for r in targets}; self.config=config; self.ids=[]; self.maps={k:defaultdict(uint_array) for k in ('name','token','gram','address','country')}; self.vec={}; self.ann=None; self.ann_name=None; self.ann_ids=[]; self.multilingual_vec={}; self.multilingual_model=None; self.multilingual_ann=None
   for pos,r in enumerate(targets):
    i=r['entity_id']; self.ids.append(i); self.maps['name'][r['name_n']].append(pos) if r['name_n'] else None
    for t in cached_value(r,'name_tokens',lambda:tokens(r['business_name'])): self.maps['token'][t].append(pos)
@@ -105,6 +105,49 @@ class Index:
    self.maps['country'][r['country_n']].append(pos) if r['country_n'] else None
    self.vec[i]=cached_value(r,'combined_vector',lambda:embed(r['business_name']+' '+r['business_address']))
   self._build_ann()
+  self._build_multilingual()
+
+ def _multilingual_config(self):
+  return self.config.get('multilingual',{})
+
+ def _build_multilingual(self):
+  """Build optional semantic name vectors; never silently fall back to lexical vectors."""
+  mc=self._multilingual_config()
+  if not mc.get('enabled',False): return
+  try:
+   from sentence_transformers import SentenceTransformer
+  except ImportError as e:
+   raise RuntimeError('multilingual retrieval is enabled but sentence-transformers is unavailable') from e
+  model_name=mc.get('model','intfloat/multilingual-e5-small')
+  self.multilingual_model=SentenceTransformer(model_name,device=mc.get('device','cpu'))
+  texts=[f"passage: {self.targets[i]['business_name']}" for i in self.ids]
+  vectors=self.multilingual_model.encode(texts,batch_size=int(mc.get('batch_size',64)),normalize_embeddings=True,show_progress_bar=False,convert_to_numpy=True)
+  self.multilingual_vec={i:tuple(float(x) for x in v) for i,v in zip(self.ids,vectors)}
+  if mc.get('index_type','exact') != 'exact': self._build_multilingual_ann(vectors)
+
+ def _build_multilingual_ann(self, vectors):
+  mc=self._multilingual_config()
+  try: import faiss, numpy as np
+  except ImportError as e: raise RuntimeError('multilingual FAISS backend requires faiss') from e
+  x=np.asarray(vectors,dtype='float32'); d=x.shape[1]; kind=mc.get('index_type')
+  if kind=='flat':
+   index=faiss.IndexFlatIP(d); index.add(x)
+  elif kind=='hnsw':
+   index=faiss.IndexHNSWFlat(d,int(mc.get('hnsw_m',32)),faiss.METRIC_INNER_PRODUCT); index.hnsw.efConstruction=int(mc.get('ef_construction',80)); index.hnsw.efSearch=int(mc.get('ef_search',64)); index.add(x)
+  elif kind=='ivfflat':
+   nlist=min(int(mc.get('nlist',64)),max(1,len(x)//8)); index=faiss.IndexIVFFlat(faiss.IndexFlatIP(d),d,nlist,faiss.METRIC_INNER_PRODUCT); index.train(x); index.add(x); index.nprobe=min(int(mc.get('nprobe',8)),nlist)
+  else: raise ValueError(f'unsupported multilingual index_type {kind!r}')
+  self.multilingual_ann=index
+
+ def _ensure_multilingual_model(self):
+  if self.multilingual_model is not None: return
+  mc=self._multilingual_config()
+  if not mc.get('enabled',False): return
+  try:
+   from sentence_transformers import SentenceTransformer
+  except ImportError as e:
+   raise RuntimeError('multilingual retrieval is enabled but sentence-transformers is unavailable') from e
+  self.multilingual_model=SentenceTransformer(mc.get('model','intfloat/multilingual-e5-small'),device=mc.get('device','cpu'))
  def _build_ann(self):
   """Build two persisted FAISS IVF-PQ indexes; bounded exact fallback is dev-only."""
   e=self.config.get('embedding',{}); backend=e.get('backend','bruteforce'); self.ann_ids=list(self.targets)
@@ -202,6 +245,19 @@ class Index:
   if method=='country':
    country_ids=self.maps['country'].get(r['country_n'],[])[:mx]
    return {self.ids[i]:n for i,n in Counter(i for t in name_tokens for i in country_ids if t in cached_value(self.targets[self.ids[i]],'name_tokens',lambda i=i:tokens(self.targets[self.ids[i]]['business_name']))).most_common(c['country_limit'])}
+  if method=='multilingual_name':
+   mc=self._multilingual_config(); k=int(mc.get('limit',c.get('multilingual_name_limit',20)))
+   if not mc.get('enabled',False): return {}
+   self._ensure_multilingual_model()
+   q=self.multilingual_model.encode([f"query: {r['business_name']}"],normalize_embeddings=True,show_progress_bar=False,convert_to_numpy=True)[0]
+   if self.multilingual_ann is not None:
+    import numpy as np
+    if hasattr(self.multilingual_ann,'hnsw'): self.multilingual_ann.hnsw.efSearch=int(mc.get('ef_search',64))
+    if hasattr(self.multilingual_ann,'nprobe'): self.multilingual_ann.nprobe=min(int(mc.get('nprobe',8)),self.multilingual_ann.nlist)
+    scores,positions=self.multilingual_ann.search(np.asarray([q],dtype='float32'),k)
+    return {self.ids[int(pos)]:float(score) for score,pos in zip(scores[0],positions[0]) if pos>=0 and score>=float(mc.get('min_similarity',0.0))}
+   ranked=sorted(((sum(float(a)*b for a,b in zip(q,v)),i) for i,v in self.multilingual_vec.items()),key=lambda x:(-x[0],x[1]))
+   return {i:score for score,i in ranked[:k] if score>=float(mc.get('min_similarity',0.0))}
   e=self.config.get('embedding',{}); k=c['embedding_limit']
   if self.ann is not None:
    import numpy as np
@@ -296,8 +352,12 @@ def candidate_report(rows, truth, s1_count, target_count):
 
 def feature_rows(rows, s1:list[dict], targets:dict[str,dict]):
  a={x['entity_id']:x for x in s1}; ans=[]
+ # Hoist reusable field views out of the pair loop. Records loaded through the
+ # normalizer already contain these values; the fallback preserves fixture compatibility.
+ s1_views={x['entity_id']:(x.get('name_tokens') or tokens(x['business_name']),x.get('address_tokens') or tokens(x['business_address'])) for x in s1}
+ target_views={i:(y.get('name_tokens') or tokens(y['business_name']),y.get('address_tokens') or tokens(y['business_address'])) for i,y in targets.items()}
  for p in rows:
-  x,y=a[p['s1_id']],targets[p['candidate_id']]; nt=cached_value(x,'name_tokens',lambda:tokens(x['business_name']));at=cached_value(y,'name_tokens',lambda:tokens(y['business_name']));na=cached_value(x,'address_tokens',lambda:tokens(x['business_address']));aa=cached_value(y,'address_tokens',lambda:tokens(y['business_address']))
+  x,y=a[p['s1_id']],targets[p['candidate_id']]; nt,na=s1_views[x['entity_id']]; at,aa=target_views[y['entity_id']]
   nm=bool(x['name_n'] and y['name_n']); am=bool(x['address_n'] and y['address_n']); cm=bool(x['country_n'] and y['country_n'])
   d={'s1_id':p['s1_id'],'candidate_id':p['candidate_id'],'candidate_source':p['candidate_source'],'methods':p['methods']}
   d.update(name_exact=float(nm and x['name_n']==y['name_n']),name_token_jaccard=jacc(nt,at),name_char_similarity=sim_normalized(x['name_n'],y['name_n']),name_length_ratio=min(len(x['name_n']),len(y['name_n']))/max(len(x['name_n']),len(y['name_n']),1),name_comparable=float(nm),address_exact=float(am and x['address_n']==y['address_n']),address_token_jaccard=jacc(na,aa),address_char_similarity=sim_normalized(x['address_n'],y['address_n']),address_comparable=float(am),country_agree=float(cm and x['country_n']==y['country_n']),country_disagree=float(cm and x['country_n']!=y['country_n']),country_missing=float(not cm),source_s2=float(y['source']=='S2'),source_s3=float(y['source']=='S3'),retrieval_count=float(len(p['methods'])),s1_name_missing=float(not x['name_n']),candidate_name_missing=float(not y['name_n']),s1_address_missing=float(not x['address_n']),candidate_address_missing=float(not y['address_n']))
