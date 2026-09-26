@@ -48,6 +48,20 @@ class PipelineTest(unittest.TestCase):
  def test_feature_matrix_is_compact_float32(self):
   rows=[{**{f:1.0 for f in FEATURES},'label':1},{**{f:0.0 for f in FEATURES},'label':0}]
   x=feature_matrix(rows);self.assertEqual(str(x.dtype),'float32');self.assertEqual(x.nbytes,2*len(FEATURES)*4)
+ def test_cached_retrieval_is_equivalent_to_uncached_records(self):
+  target=[]
+  for i in range(3):
+   r={'entity_id':f'S2-{i}','business_name':f'Acme Store {i}','business_address':f'{i} Main Road','country':'US','source':'S2','ordinal':i,'name_n':norm(f'Acme Store {i}'),'address_n':norm(f'{i} Main Road'),'country_n':'us'};target.append(enrich_record(r))
+  conf={'retrieval':{'token_limit':3,'fuzzy_limit':3,'address_limit':3,'country_limit':3,'embedding_limit':3,'max_postings':20},'embedding':{'backend':'bruteforce','bruteforce_max_targets':10}}
+  raw={'entity_id':'S1-1','business_name':'Acme Store 1','business_address':'1 Main Road','country':'US','source':'S1','ordinal':0,'name_n':'acme store 1','address_n':'1 main road','country_n':'us'}
+  self.assertEqual(Index(target,conf).query(raw),Index(target,conf).query(enrich_record(dict(raw))))
+ def test_threaded_candidate_methods_preserve_union(self):
+  s1=[enrich_record({'entity_id':'S1-1','business_name':'Acme','business_address':'One Road','country':'US','source':'S1','ordinal':0,'name_n':'acme','address_n':'one road','country_n':'us'})]
+  t=[enrich_record({'entity_id':'S2-1','business_name':'Acme','business_address':'One Road','country':'US','source':'S2','ordinal':0,'name_n':'acme','address_n':'one road','country_n':'us'})]
+  conf={'retrieval':{'token_limit':3,'fuzzy_limit':3,'address_limit':3,'country_limit':3,'embedding_limit':3,'max_postings':20},'embedding':{'backend':'bruteforce','bruteforce_max_targets':10}}
+  with tempfile.TemporaryDirectory() as d:
+   a=resumable_candidates(s1,Index(t,conf),CheckpointStore(Path(d)/'a',{'x':1}),1,1);b=resumable_candidates(s1,Index(t,conf),CheckpointStore(Path(d)/'b',{'x':1}),1,2)
+   self.assertEqual(a,b)
  def test_checkpoint_skip_partial_failure_and_corruption(self):
   with tempfile.TemporaryDirectory() as d:
    store=CheckpointStore(d,{'input':'a','config':'v1'}); calls=[]

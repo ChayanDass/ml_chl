@@ -29,7 +29,7 @@ def index_for(data,split,art,c,sample=None):
 def run_train(a):
  c=cfg(a.config); assert_capacity(a.artifacts,c['resources']); d,idx,h=index_for(a.data,'train',a.artifacts,c,a.sample); base=Path(a.artifacts)/'experiments'/a.experiment
  lineage={'input_hash':stable_hash([x['entity_id'] for x in d['s1']]),'index_hash':h,'candidate_config':{'retrieval':c['retrieval'],'embedding':c.get('embedding',{})},'schema_hash':schema_manifest()['schema_hash'],'training_config':{'seed':c['seed'],'validation_fraction':c['validation_fraction'],'negative_ratio':c['negative_ratio'],'model':c['model']},'run':'train'}; store=CheckpointStore(base/'recovery',lineage)
- rows=resumable_candidates(d['s1'],idx,store,c['batch_size']); feats=resumable_features(rows,d['s1'],idx.targets,store,c['batch_size'])
+ rows=resumable_candidates(d['s1'],idx,store,c['batch_size'],c['resources'].get('candidate_method_workers',1)); feats=resumable_features(rows,d['s1'],idx.targets,store,c['batch_size'])
  splitrows=store.run('training_prep','split',lambda:[{'kind':'train','id':x} for x in sorted(split_ids([x['entity_id'] for x in d['s1']],d['truth'],c['validation_fraction'],c['seed'])[0])]+[{'kind':'validation','id':x} for x in sorted(split_ids([x['entity_id'] for x in d['s1']],d['truth'],c['validation_fraction'],c['seed'])[1])])
  train_ids={x['id'] for x in splitrows if x['kind']=='train'}; val_ids={x['id'] for x in splitrows if x['kind']=='validation'}
  labelled=store.run('training_prep','sample',lambda:label_and_sample(feats,d['truth'],train_ids,c['negative_ratio'],c['seed']))
@@ -58,7 +58,7 @@ def run_infer(a):
  mt,ct=stage/'matching_results.tsv.tmp',stage/'candidate_pairs.tsv.tmp'; total=0
  with mt.open('w',encoding='utf8',newline='') as mf,ct.open('w',encoding='utf8',newline='') as cf:
   mw,cw=csv.writer(mf,delimiter='\t',lineterminator='\n'),csv.writer(cf,delimiter='\t',lineterminator='\n');mw.writerow(['source1_entity_id','matched_entity_ids']);cw.writerow(['source1_entity_id','candidate_entity_ids'])
-  partitions=iter_resumable_candidates(d['s1'],idx,store,c['batch_size'])
+  partitions=iter_resumable_candidates(d['s1'],idx,store,c['batch_size'],c['resources'].get('candidate_method_workers',1))
   for bid,part,pairs,features in iter_resumable_features(partitions,idx.targets,store):
    scored=store.run('scores',bid,lambda r=features:score_partition(r,model),{'pair_count':len(features),'threshold':man['threshold']}); by_s1=defaultdict(list);accepted=defaultdict(list)
    for r in scored:

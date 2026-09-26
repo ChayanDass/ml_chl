@@ -6,6 +6,7 @@ the retrieval/index stages remain runnable on constrained machines.
 from __future__ import annotations
 import csv, hashlib, json, math, os, pickle, random, re, shutil, sys, time, unicodedata
 from array import array
+from concurrent.futures import ThreadPoolExecutor
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from difflib import SequenceMatcher
@@ -36,12 +37,18 @@ def jacc(a:Iterable[str],b:Iterable[str]) -> float:
 def chargrams(s:str,n=3):
  s=" "+norm(s)+" "; return {s[i:i+n] for i in range(max(0,len(s)-n+1))}
 def sim(a:str,b:str)->float: return SequenceMatcher(None,norm(a),norm(b),autojunk=False).ratio() if a and b else 0.
+def sim_normalized(a:str,b:str)->float: return SequenceMatcher(None,a,b,autojunk=False).ratio() if a and b else 0.
 def embed(s:str, dims=64):
  # deterministic hashed char n-gram vector: local, no external lookup/model.
  v=[0.0]*dims
  for g in chargrams(s): v[int(hashlib.blake2b(g.encode(),digest_size=8).hexdigest(),16)%dims]+=1
  z=math.sqrt(sum(q*q for q in v)); return tuple(q/z for q in v) if z else tuple(v)
 def cosine(a,b): return sum(x*y for x,y in zip(a,b))
+def enrich_record(row:dict):
+ """Label-independent reusable representations shared by indexes, retrieval and features."""
+ row['name_tokens']=tokens(row['business_name']);row['address_tokens']=tokens(row['business_address']);row['name_grams']=chargrams(row['business_name']);row['name_vector']=embed(row['business_name']);row['combined_vector']=embed(row['business_name']+' '+row['business_address'])
+ return row
+def cached_value(row,key,producer): return row[key] if key in row else producer()
 
 def load_records(path:Path, source:str, sample:int|None=None) -> list[dict]:
  out=[]; seen=set()
@@ -54,7 +61,7 @@ def load_records(path:Path, source:str, sample:int|None=None) -> list[dict]:
    eid=(row.get("entity_id") or "").strip()
    if not eid.startswith(source+"-") or not eid: raise ValueError(f"{path}:{ordinal+2}: invalid {source} id {eid!r}")
    if eid in seen: raise ValueError(f"{path}: duplicate ID {eid}")
-   seen.add(eid); row.update(source=source,ordinal=ordinal,name_n=norm(row["business_name"]),address_n=norm(row["business_address"]),country_n=norm(row["country"])); out.append(row)
+   seen.add(eid); row.update(source=source,ordinal=ordinal,name_n=norm(row["business_name"]),address_n=norm(row["business_address"]),country_n=norm(row["country"])); out.append(enrich_record(row))
    if sample and len(out)>=sample: break
  return out
 def load_truth(path:Path,s1:set[str], targets:set[str], partial:bool=False) -> dict[str,set[str]]:
@@ -92,11 +99,11 @@ class Index:
   self.targets={r['entity_id']:r for r in targets}; self.config=config; self.ids=[]; self.maps={k:defaultdict(uint_array) for k in ('name','token','gram','address','country')}; self.vec={}; self.ann=None; self.ann_name=None; self.ann_ids=[]
   for pos,r in enumerate(targets):
    i=r['entity_id']; self.ids.append(i); self.maps['name'][r['name_n']].append(pos) if r['name_n'] else None
-   for t in tokens(r['business_name']): self.maps['token'][t].append(pos)
-   for g in chargrams(r['business_name']): self.maps['gram'][g].append(pos)
+   for t in cached_value(r,'name_tokens',lambda:tokens(r['business_name'])): self.maps['token'][t].append(pos)
+   for g in cached_value(r,'name_grams',lambda:chargrams(r['business_name'])): self.maps['gram'][g].append(pos)
    self.maps['address'][r['address_n']].append(pos) if r['address_n'] else None
    self.maps['country'][r['country_n']].append(pos) if r['country_n'] else None
-   self.vec[i]=embed(r['business_name']+' '+r['business_address'])
+   self.vec[i]=cached_value(r,'combined_vector',lambda:embed(r['business_name']+' '+r['business_address']))
   self._build_ann()
  def _build_ann(self):
   """Build two persisted FAISS IVF-PQ indexes; bounded exact fallback is dev-only."""
@@ -118,7 +125,7 @@ class Index:
   def make(vectors):
    x=np.asarray(vectors,dtype='float32'); q=faiss.IndexFlatIP(d); idx=faiss.IndexIVFPQ(q,d,nlist,m,bits,faiss.METRIC_INNER_PRODUCT)
    idx.train(x[:sample]);idx.add(x);idx.nprobe=min(int(e.get('nprobe',32)),nlist);return idx
-  self.ann=make([self.vec[i] for i in self.ann_ids]); self.ann_name=make([embed(self.targets[i]['business_name']) for i in self.ann_ids])
+  self.ann=make([self.vec[i] for i in self.ann_ids]); self.ann_name=make([cached_value(self.targets[i],'name_vector',lambda i=i:embed(self.targets[i]['business_name'])) for i in self.ann_ids])
   # IVF-PQ owns compact codes; retaining Python tuple vectors would defeat its memory purpose.
   self.vec={}
  def memory_stats(self):
@@ -176,36 +183,37 @@ class Index:
   """Method-level retrieval isolates failed families during recovery."""
   if method not in METHODS: raise ValueError(f'unknown retrieval method {method}')
   c=self.config['retrieval']; mx=c['max_postings']
+  name_tokens=cached_value(r,'name_tokens',lambda:tokens(r['business_name'])); address_tokens=cached_value(r,'address_tokens',lambda:tokens(r['business_address'])); name_grams=cached_value(r,'name_grams',lambda:chargrams(r['business_name']))
   if method=='exact_name': return {self.ids[i]:1.0 for i in self._take(self.maps['name'].get(r['name_n'],[]),mx)}
   if method=='token_name':
-   counts=Counter(i for t in tokens(r['business_name']) for i in self.maps['token'].get(t,[])[:mx])
-   return {self.ids[i]:n/max(1,len(tokens(r['business_name']))) for i,n in counts.most_common(c['token_limit'])}
+   counts=Counter(i for t in name_tokens for i in self.maps['token'].get(t,[])[:mx])
+   return {self.ids[i]:n/max(1,len(name_tokens)) for i,n in counts.most_common(c['token_limit'])}
   if method=='fuzzy_name':
-   gcounts=Counter(i for g in chargrams(r['business_name']) for i in self.maps['gram'].get(g,[])[:mx]); hits={}
+   gcounts=Counter(i for g in name_grams for i in self.maps['gram'].get(g,[])[:mx]); hits={}
    for i,_ in gcounts.most_common(c['fuzzy_limit']*4):
     q=sim(r['business_name'],self.targets[self.ids[i]]['business_name'])
     if q>=.35: hits[self.ids[i]]=q
    return dict(sorted(hits.items(),key=lambda x:(-x[1],x[0]))[:c['fuzzy_limit']])
   if method=='address':
    hits={self.ids[i]:1.0 for i in self._take(self.maps['address'].get(r['address_n'],[]),c['address_limit'])}
-   counts=Counter(i for t in tokens(r['business_address']) for i in self.maps['token'].get(t,[])[:mx])
-   for i,n in counts.most_common(c['address_limit']): hits.setdefault(self.ids[i],n/max(1,len(tokens(r['business_address']))))
+   counts=Counter(i for t in address_tokens for i in self.maps['token'].get(t,[])[:mx])
+   for i,n in counts.most_common(c['address_limit']): hits.setdefault(self.ids[i],n/max(1,len(address_tokens)))
    return hits
   if method=='country':
    country_ids=self.maps['country'].get(r['country_n'],[])[:mx]
-   return {self.ids[i]:n for i,n in Counter(i for t in tokens(r['business_name']) for i in country_ids if t in tokens(self.targets[self.ids[i]]['business_name'])).most_common(c['country_limit'])}
+   return {self.ids[i]:n for i,n in Counter(i for t in name_tokens for i in country_ids if t in cached_value(self.targets[self.ids[i]],'name_tokens',lambda i=i:tokens(self.targets[self.ids[i]]['business_name']))).most_common(c['country_limit'])}
   e=self.config.get('embedding',{}); k=c['embedding_limit']
   if self.ann is not None:
    import numpy as np
    # Union name-focused and name+address ANN neighbours, retaining maximum score evidence.
    hits={}
-   for ann,v in ((self.ann,embed(r['business_name']+' '+r['business_address'])),(self.ann_name,embed(r['business_name']))):
+   for ann,v in ((self.ann,cached_value(r,'combined_vector',lambda:embed(r['business_name']+' '+r['business_address']))),(self.ann_name,cached_value(r,'name_vector',lambda:embed(r['business_name'])))):
     scores,ids=ann.search(np.asarray([v],dtype='float32'),k)
     for score,pos in zip(scores[0],ids[0]):
      if pos>=0 and score>0:hits[self.ann_ids[int(pos)]]=max(hits.get(self.ann_ids[int(pos)],-1),float(score))
    return dict(sorted(hits.items(),key=lambda x:(-x[1],x[0]))[:k])
   if len(self.targets)>e.get('bruteforce_max_targets',100000): raise RuntimeError('embedding fallback refuses exhaustive full-scale search; build FAISS IVF-PQ index')
-  qv=embed(r['business_name']+' '+r['business_address'])
+  qv=cached_value(r,'combined_vector',lambda:embed(r['business_name']+' '+r['business_address']))
   return {i:score for score,i in sorted(((cosine(qv,v),i) for i,v in self.vec.items()),reverse=True)[:k] if score>0}
 
 def candidates(s1:list[dict], index:Index):
@@ -229,22 +237,23 @@ def union_candidate_method_rows(method_rows):
   if r['method'] not in out['methods']: out['methods'].append(r['method'])
   out['evidence'][r['method']]=r['score']
  return [merged[k] for k in sorted(merged)]
-def resumable_candidates(s1, index, store, batch_size):
+def _method_rows_for_partition(part,index,store,bid,start,method_workers):
+ def one(method): return store.run('candidate_methods',f'{bid}.{method}',lambda m=method,p=part:candidate_method_rows(p,index,m),{'method':method,'s1_start':start,'s1_end':start+len(part)})
+ if method_workers<=1:return [one(m) for m in METHODS]
+ # Threads share one read-only index; no process-index duplication or nested process pools.
+ with ThreadPoolExecutor(max_workers=min(method_workers,len(METHODS))) as pool: return list(pool.map(one,METHODS))
+def resumable_candidates(s1, index, store, batch_size, method_workers=1):
  """Persist each retrieval-family × deterministic S1 batch before unioning it."""
  all_rows=[]
  for start in range(0,len(s1),batch_size):
   part=s1[start:start+batch_size]; bid=f'{start:012d}-{start+len(part):012d}'
-  method_rows=[]
-  for method in METHODS:
-   method_rows.extend(store.run('candidate_methods',f'{bid}.{method}',lambda m=method,p=part:candidate_method_rows(p,index,m),{'method':method,'s1_start':start,'s1_end':start+len(part)}))
+  method_rows=[row for rows in _method_rows_for_partition(part,index,store,bid,start,method_workers) for row in rows]
   all_rows.extend(store.run('candidate_union',bid,lambda r=method_rows:union_candidate_method_rows(r),{'s1_start':start,'s1_end':start+len(part)}))
  return all_rows
-def iter_resumable_candidates(s1,index,store,batch_size):
+def iter_resumable_candidates(s1,index,store,batch_size,method_workers=1):
  """Disk-backed candidate stream: only one S1 partition is resident."""
  for start in range(0,len(s1),batch_size):
-  part=s1[start:start+batch_size]; bid=f'{start:012d}-{start+len(part):012d}'; method_rows=[]
-  for method in METHODS:
-   method_rows.extend(store.run('candidate_methods',f'{bid}.{method}',lambda m=method,p=part:candidate_method_rows(p,index,m),{'method':method,'s1_start':start,'s1_end':start+len(part)}))
+  part=s1[start:start+batch_size]; bid=f'{start:012d}-{start+len(part):012d}'; method_rows=[row for rows in _method_rows_for_partition(part,index,store,bid,start,method_workers) for row in rows]
   yield bid,part,store.run('candidate_union',bid,lambda r=method_rows:union_candidate_method_rows(r),{'s1_start':start,'s1_end':start+len(part)})
 def resumable_features(candidate_rows,s1,targets,store,batch_size):
  by_s1=defaultdict(list)
@@ -288,10 +297,10 @@ def candidate_report(rows, truth, s1_count, target_count):
 def feature_rows(rows, s1:list[dict], targets:dict[str,dict]):
  a={x['entity_id']:x for x in s1}; ans=[]
  for p in rows:
-  x,y=a[p['s1_id']],targets[p['candidate_id']]; nt,at=tokens(x['business_name']),tokens(y['business_name']); na,aa=tokens(x['business_address']),tokens(y['business_address'])
+  x,y=a[p['s1_id']],targets[p['candidate_id']]; nt=cached_value(x,'name_tokens',lambda:tokens(x['business_name']));at=cached_value(y,'name_tokens',lambda:tokens(y['business_name']));na=cached_value(x,'address_tokens',lambda:tokens(x['business_address']));aa=cached_value(y,'address_tokens',lambda:tokens(y['business_address']))
   nm=bool(x['name_n'] and y['name_n']); am=bool(x['address_n'] and y['address_n']); cm=bool(x['country_n'] and y['country_n'])
   d={'s1_id':p['s1_id'],'candidate_id':p['candidate_id'],'candidate_source':p['candidate_source'],'methods':p['methods']}
-  d.update(name_exact=float(nm and x['name_n']==y['name_n']),name_token_jaccard=jacc(nt,at),name_char_similarity=sim(x['business_name'],y['business_name']),name_length_ratio=min(len(x['name_n']),len(y['name_n']))/max(len(x['name_n']),len(y['name_n']),1),name_comparable=float(nm),address_exact=float(am and x['address_n']==y['address_n']),address_token_jaccard=jacc(na,aa),address_char_similarity=sim(x['business_address'],y['business_address']),address_comparable=float(am),country_agree=float(cm and x['country_n']==y['country_n']),country_disagree=float(cm and x['country_n']!=y['country_n']),country_missing=float(not cm),source_s2=float(y['source']=='S2'),source_s3=float(y['source']=='S3'),retrieval_count=float(len(p['methods'])),s1_name_missing=float(not x['name_n']),candidate_name_missing=float(not y['name_n']),s1_address_missing=float(not x['address_n']),candidate_address_missing=float(not y['address_n']))
+  d.update(name_exact=float(nm and x['name_n']==y['name_n']),name_token_jaccard=jacc(nt,at),name_char_similarity=sim_normalized(x['name_n'],y['name_n']),name_length_ratio=min(len(x['name_n']),len(y['name_n']))/max(len(x['name_n']),len(y['name_n']),1),name_comparable=float(nm),address_exact=float(am and x['address_n']==y['address_n']),address_token_jaccard=jacc(na,aa),address_char_similarity=sim_normalized(x['address_n'],y['address_n']),address_comparable=float(am),country_agree=float(cm and x['country_n']==y['country_n']),country_disagree=float(cm and x['country_n']!=y['country_n']),country_missing=float(not cm),source_s2=float(y['source']=='S2'),source_s3=float(y['source']=='S3'),retrieval_count=float(len(p['methods'])),s1_name_missing=float(not x['name_n']),candidate_name_missing=float(not y['name_n']),s1_address_missing=float(not x['address_n']),candidate_address_missing=float(not y['address_n']))
   d['cross_name_address_mean']=(d['name_char_similarity']+d['address_char_similarity'])/2; d['cross_both_exact']=d['name_exact']*d['address_exact']
   for m in METHODS:d[m+'_hit']=float(m in p['methods'])
   ans.append(d)

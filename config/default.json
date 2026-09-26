@@ -25,6 +25,7 @@
   "resources": {
     "device": "cpu",
     "workers": 20,
+    "candidate_method_workers": 1,
     "ram_soft_limit_gb": 96,
     "ram_hard_limit_gb": 112,
     "disk_reserve_gb": 80,
